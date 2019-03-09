@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!-- <meta name="viewport" content="width=device&#45;width"> -->
+		<title>Science Communication and Misinformation Research Coauthorship Visualization</title>
+		<link rel="stylesheet" type="text/css" href="tooltipster/dist/css/tooltipster.bundle.min.css" />
+		<link rel="stylesheet" type="text/css" href="tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-noir.min.css" />
+		<style>
+
+		.links line {
+			stroke: #999;
+			stroke-opacity: 0.6;
+		}
+
+		.nodes circle {
+			stroke: #fff;
+			stroke-width: 1.5px;
+		}
+
+		.node text {
+			pointer-events: none;
+			font: 10px sans-serif;
+		}
+
+		#nodelab-form {
+			visibility: hidden;
+		}
+
+		#tooltip-template {
+			display: none;
+		}
+
+		.paper_titles ul {
+			list-style: disc inside;
+			margin-left: 0;
+			padding-left: 0;
+		}
+
+		.paper_titles li {
+			margin: 0;
+			padding: 0;
+		}
+		
+
+		</style>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/fuse/2.6.1/fuse.min.js"></script>
+		<script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+		<script type="text/javascript" src="tooltipster/dist/js/plugins/tooltipster/SVG/tooltipster-SVG.min.js"></script>
+		<script type="text/javascript" src="tooltipster-discovery/tooltipster-discovery.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.1/svg.min.js"></script>
+		<script type="text/javascript" src="svg.screenbbox.min.js"></script>
+	</head>
+
+	<body>
+		<h1>Coauthorship network of researchers studying science communication and misinformation</h1>
+		<div class="vis-description">
+			<p>
+			Coauthorship network for a set of research papers in the fields of science communication and misinformation. Nodes represent authors, and weighted links represent collaborations between authors on research papers. The network was clustered using <a href="http://www.mapequation.org/" target="_blank">Infomap</a>. The colors of the nodes are assigned based on the top level of the hierarichal clustering. The size of the nodes represent the flow-based rank of each node in this network. The connected component with ten nodes or more are shown. Click and drag the nodes to move them around.
+			</p>
+		</div>
+		<div>
+			<input type="text" size="50" placeholder="Search author name or affiliation (at least 4 characters)" name="textSearch" id="textSearch"/>
+		</div>
+		<div>
+			<input type="checkbox" name="tooltipCheckbox" id="tooltipCheckbox" checked/>
+			<label for="tooltipCheckbox">Tooltips</label>
+		</div>
+		<form action="" id="nodelab-form">
+			<input type="radio" name="nodelab-radio" value="none" checked="checked">No node labels
+			<input type="radio" name="nodelab-radio" value="author_name">Show author name node labels
+			<input type="radio" name="nodelab-radio" value="affil_name">Show affiliation node labels
+		</form>
+		<svg width="960" height="600"></svg>
+
+		<div id="tooltip-template">
+			<div class="author_name">
+				<h3 class="template-content"></h3>
+			</div>
+			<div class="cluster_id">
+				<p>Cluster ID: <span class="template-content"></span></p>
+			</div>
+			<div class="affil_name">
+				<p>Affiliation: <span class="template-content"></span></p>
+			</div>
+			<div class="paper_titles">
+				<h5>Papers:</h5>
+				<ul class="template-content">
+				</ul>
+			</div>
+		</div>  <!-- tooltip-template -->
+
+
+
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script>
+			var coauthorship_fname = "coauthorship_nas2_doilinked_largest_cc.json";
+		</script>
+		<script src="vis.js"></script>
+	</body>
+</html>
