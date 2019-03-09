@@ -72,8 +72,9 @@
 			<input type="radio" name="nodelab-radio" value="author_name">Show author name node labels
 			<input type="radio" name="nodelab-radio" value="affil_name">Show affiliation node labels
 		</form>
-		<svg width="960" height="600"></svg>
 
+		<div id="chartDiv"></div>
+		
 		<div id="tooltip-template">
 			<div class="author_name">
 				<h3 class="template-content"></h3>
@@ -93,7 +94,6 @@
 
 
 
-		<script src="https://d3js.org/d3.v5.min.js"></script>
 		<script>
 			var coauthorship_fname = "coauthorship_nas2_doilinked_largest_cc.json";
 		</script>
