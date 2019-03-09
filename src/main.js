@@ -25,7 +25,7 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var manyBody = d3.forceManyBody()
 					.strength(-2);
@@ -40,8 +40,7 @@ var sizeScale = d3.scaleLinear()
 	.range([4, 12]);
 
 
-d3.json("coauthorship_nas2_doilinked_largest_cc.json", function(error, graph) {
-  if (error) throw error;
+d3.json("coauthorship_nas2_doilinked_largest_cc.json").then(function(graph) {
 	console.log(graph);
 
 	graph.nodes.forEach(function(d) {
