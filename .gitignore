@@ -1,1 +1,8 @@
 *.json
+.ipynb_checkpoints/
+venv
+.DS_Store
+node_modules
+package-lock.json
+public/bundle*
+notebooks/
