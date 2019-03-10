@@ -21,17 +21,11 @@ var fuseOptions = {
 };
 
 d3.json("coauthorship_nas2_doilinked_largest_cc.json").then(function(graph) {
-	console.log('d3 json');
 	var nodelinkvis = NodeLinkCoauthorshipVis().width(960).data(graph);
 	d3.select("#chartDiv").call(nodelinkvis);
 	// nodelinkvis.data(graph);
-	//
-	// nothing below this is running. why??
-	console.log('after call');
-	setTimeout(function() {
-		console.log('timeout');
-		activateTooltips();
-	}, 1000);
+
+	activateTooltips();
 
 });
 

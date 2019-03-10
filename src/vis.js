@@ -6,10 +6,6 @@ import jQuery from 'jquery';
 export default NodeLinkCoauthorshipVis;
 
 
-var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-var manyBody = d3.forceManyBody()
-					.strength(-2);
 
 // reusable chart pattern inspired by:
 // https://bost.ocks.org/mike/chart/
@@ -21,6 +17,11 @@ function NodeLinkCoauthorshipVis() {
 
 	var updateData;
 	var updateWidth;
+
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	var manyBody = d3.forceManyBody()
+						.strength(-2);
 
 	function chart(selection) {
 		selection.each(function() {
@@ -71,6 +72,22 @@ function NodeLinkCoauthorshipVis() {
 			  .attr("r", function(d) { return d.radius = sizeScale(d.flow); })
 			  .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
 
+			function dragstarted(d) {
+			  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+			  d.fx = d.x;
+			  d.fy = d.y;
+			}
+
+			function dragged(d) {
+			  d.fx = d3.event.x;
+			  d.fy = d3.event.y;
+			}
+
+			function dragended(d) {
+			  if (!d3.event.active) simulation.alphaTarget(0);
+			  d.fx = null;
+			  d.fy = null;
+			}
 			// node.append("text")
 			// 	.attr("class", "affil_name")
 			// 	.style("display", "none")  // hidden initially
@@ -161,34 +178,35 @@ function NodeLinkCoauthorshipVis() {
 			// nodeTooltips();  // not working!!
 			svg.on("click", reset_layout);
 
-			var fuse = new Fuse(graph.nodes, fuseOptions);
-			var result = fuse.search("ehlow");
-			console.log(result);
-			$( '#textSearch' ).on( 'input', fuseSelect );
-			function fuseSelect() {
-				// reset node sizes and styles
-				d3.selectAll(".node circle")
-					.style("stroke-width", 1)
-					.style("stroke", "white")
-					.attr("r", function(d) { return d.radius; });
-
-				var $this = $( this );
-				var query = $this.val();
-				console.log($this.val());
-				if (query.length > 3) {
-					var result = fuse.search(query);
-					if (result.length !=0) {
-						for (var i = 0, len = result.length; i < len; i++) {
-							var authorId = result[i];
-							node.filter(function(d) { return d.id == authorId; })
-								.select("circle")
-								.style("stroke-width", 2)
-								.style("stroke", "black")
-								.attr("r", function(d) { return d.radius * 1.5; });
-						}
-					}
-				}
-			}
+			// TODO this is broken. fix it.
+			// var fuse = new Fuse(graph.nodes, fuseOptions);
+			// var result = fuse.search("ehlow");
+			// console.log(result);
+			// $( '#textSearch' ).on( 'input', fuseSelect );
+			// function fuseSelect() {
+			// 	// reset node sizes and styles
+			// 	d3.selectAll(".node circle")
+			// 		.style("stroke-width", 1)
+			// 		.style("stroke", "white")
+			// 		.attr("r", function(d) { return d.radius; });
+            //
+			// 	var $this = $( this );
+			// 	var query = $this.val();
+			// 	console.log($this.val());
+			// 	if (query.length > 3) {
+			// 		var result = fuse.search(query);
+			// 		if (result.length !=0) {
+			// 			for (var i = 0, len = result.length; i < len; i++) {
+			// 				var authorId = result[i];
+			// 				node.filter(function(d) { return d.id == authorId; })
+			// 					.select("circle")
+			// 					.style("stroke-width", 2)
+			// 					.style("stroke", "black")
+			// 					.attr("r", function(d) { return d.radius * 1.5; });
+			// 			}
+			// 		}
+			// 	}
+			// }
 
 			updateWidth = function() {
 				// use width to make any changes
@@ -226,20 +244,4 @@ function NodeLinkCoauthorshipVis() {
 
 
 
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
-
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
 
