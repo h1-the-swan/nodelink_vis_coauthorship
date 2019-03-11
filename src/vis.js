@@ -71,7 +71,15 @@ function NodeLinkCoauthorshipVis() {
 
 			var nodeCircle = node.append("circle")
 			  .attr("r", function(d) { return d.radius = sizeScale(d.flow); })
-			  .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
+			  // .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
+			  .attr("fill", function(d) {
+				  if (d.hasOwnProperty("cl_top")) {
+					  d.color_orig = color(d.cl_top);
+				  } else {
+					  d.color_orig = color(0);
+				  }
+				  return d.color_orig
+			  });
 
 			function dragstarted(d) {
 			  if (!d3.event.active) simulation.alphaTarget(0.3).restart();

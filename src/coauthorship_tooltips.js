@@ -25,7 +25,7 @@ function activateTooltips() {
 		var tippyInstance = tippy(this);
 		fillHtml($tooltipNode, 'author_name', d.author_name);
 		fillHtml($tooltipNode, 'affil_name', d.affil_name);
-		fillHtml($tooltipNode, 'cluster_id', d.cl_bottom);
+		if (d.hasOwnProperty('cl_bottom')) fillHtml($tooltipNode, 'cluster_id', d.cl_bottom);
 		var $paperTitles = $tooltipNode.find( '.paper_titles' ).find( '.template-content' );
 		for (var i = 0, len = d.papers.length; i < len; i++) {
 			var $listItem = $( '<li class="paper_title">' ).text(d.papers[i].title);
