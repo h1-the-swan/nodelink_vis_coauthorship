@@ -117,7 +117,7 @@ function NodeLinkCoauthorshipVis() {
 				d.id = d.id.toString();
 			});
 			graph.links.forEach(function(d) {
-				d.id = getLinkId(d);
+				d.id = getLinkId(d, graph.directed);
 			});
 
 			var simulation = d3.forceSimulation()
@@ -145,34 +145,15 @@ function NodeLinkCoauthorshipVis() {
 			.data(graph.links, function(d) {
 				return d.id;
 			});
-			// .enter();
-			// .append("line").attr("class", "link")
-			//   .attr("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
 		  var node = svg.append("g")
 			  .attr("class", "nodes")
 			.selectAll(".node")
 			.data(graph.nodes, function(d) { return d.id; });
-			// .enter();
-				// .append("g")
-			  // // .attr("r", 5)
-				// .attr("class", "node")
-			  // .call(d3.drag()
-				//   .on("start", dragstarted)
-				//   .on("drag", dragged)
-				//   .on("end", dragended));
+
 			node = enterNodes(node);
 			link = enterLinks(link);
 
-
-			// node.append("text")
-			// 	.attr("class", "affil_name")
-			// 	.style("display", "none")  // hidden initially
-			// 	.text(function(d) { return d.affil_name; });
-			// node.append("text")
-			// 	.attr("class", "author_name")
-			// 	.style("display", "none")  // hidden initially
-			// 	.text(function(d) { return d.author_name_detex; });
 
 			// nodeCircle.on('click', function(d) {
 			// 	node.classed('focus', false);
@@ -197,23 +178,6 @@ function NodeLinkCoauthorshipVis() {
 			//
 			// });
 
-		  // node.append("title")
-		  //     // .text(function(d) { return d.author_name; });
-		  //     .text(function(d) { 
-			// 	  var titles = [];
-			// 	  for (var i = 0, len = d.papers.length; i < len; i++) {
-			// 	  	titles.push(d.papers[i].title);
-			// 	  }
-			// 	  return  d.author_name + '\n' + d.cl_bottom + '\n' + titles.join('\n');
-			//   });
-			// node.attr("title", function(d) {
-			// 	  // var titles = [];
-			// 	  // for (var i = 0, len = d.papers.length; i < len; i++) {
-			// 	  // 	titles.push(d.papers[i].title);
-			// 	  // }
-			// 	  // return  d.author_name + '\n' + d.cl_bottom + '\n' + titles.join('\n');
-			// 	return d.author_name_detex + ' ' + d.affil_name;
-			// });
 
 		  simulation
 			  .nodes(graph.nodes)
@@ -252,17 +216,7 @@ function NodeLinkCoauthorshipVis() {
 				link.style("opacity", 1);
 				$( '#nodelab-form' ).css( 'visibility' , 'hidden' );
 			}
-			// nodeTooltips();  // not working!!
 			svg.on("click", reset_layout);
-
-			// // TEST
-			// setTimeout(function() {
-			// 	d3.json("data/test_coauthorship_graph_misinfo.json").then(function(graph) {
-			// 		simulation.stop();
-			// 		d3.selectAll('.node').data(graph.nodes, function(d) { return d.id; }).exit().remove();
-			// 		// link.data(graph.links, function(d) { return d.id; }).exit().remove();
-			// 	});
-			// }, 2000);
 
 			// TODO this is broken. fix it.
 			// var fuse = new Fuse(graph.nodes, fuseOptions);
@@ -296,6 +250,8 @@ function NodeLinkCoauthorshipVis() {
 
 			updateWidth = function() {
 				// use width to make any changes
+				//
+				// NOT IMPLEMENTED
 			};
 
 			updateData = function() {
@@ -306,13 +262,10 @@ function NodeLinkCoauthorshipVis() {
 					d.id = d.id.toString();
 				});
 				graph.links.forEach(function(d) {
-					d.id = getLinkId(d);
+					d.id = getLinkId(d, graph.directed);
 				});
 				console.log(graph);
 				// simulation.stop();
-				// var linkExit = link.data(graph.links, function(d) { return d.id; }).exit().remove();
-				// console.log(linkExit);
-				// node = d3.selectAll('.node').data(graph.nodes, function(d) { return d.id; });
 				node = node.data(graph.nodes, function(d) { return d.id; });
 				var nodeExit = node.exit();
 				// nodeExit.selectAll("circle").attr("fill", "red");
@@ -320,11 +273,6 @@ function NodeLinkCoauthorshipVis() {
 				node = enterNodes(node);
 
 
-				// var orig_ids = [];
-				// link.each(function(d) {
-				// 	orig_ids.push(d.id);
-				// });
-				// link = d3.selectAll('.link')
 				link = link
 					.data(graph.links, function(d) {
 						// d.id = getLinkId(d);
@@ -333,26 +281,15 @@ function NodeLinkCoauthorshipVis() {
 				var linkExit = link.exit();
 				linkExit.remove();
 				link = enterLinks(link);
-				// console.log(orig_ids);
-				// link.each(function(d) {
-				// 	if (orig_ids.includes(d.id)) {
-				// 		console.log("true");
-				// 	} else {
-				// 		console.log("false");
-				// 	}
-				// });
-				// var linkEnter = link.enter();
 				link.style("stroke", "red");
+
 				simulation
 					.nodes(graph.nodes)
 					.on("tick", ticked);
 
 				simulation.force("link")
 					.links(graph.links);
-				// for (var i = 0; i < 30; i++) {
-				// 	simulation.tick()
-				// }
-				// console.log("ticked");
+
 				// simulation.restart();
 			}
 
