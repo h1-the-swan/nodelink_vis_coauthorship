@@ -37,23 +37,6 @@ function NodeLinkCoauthorshipVis() {
 		return items[0] + sep + items[1];
 	}
 
-	function dragstarted(d) {
-	  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-	  d.fx = d.x;
-	  d.fy = d.y;
-	}
-
-	function dragged(d) {
-	  d.fx = d3.event.x;
-	  d.fy = d3.event.y;
-	}
-
-	function dragended(d) {
-	  if (!d3.event.active) simulation.alphaTarget(0);
-	  d.fx = null;
-	  d.fy = null;
-	}
-
 
 	function chart(selection) {
 		selection.each(function() {
@@ -61,6 +44,23 @@ function NodeLinkCoauthorshipVis() {
 
 			var height = .625 * width;
 			var svg = d3.select(selItem).append("svg").attr("width", width).attr("height", height);
+
+			function dragstarted(d) {
+			  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+			  d.fx = d.x;
+			  d.fy = d.y;
+			}
+
+			function dragged(d) {
+			  d.fx = d3.event.x;
+			  d.fy = d3.event.y;
+			}
+
+			function dragended(d) {
+			  if (!d3.event.active) simulation.alphaTarget(0);
+			  d.fx = null;
+			  d.fy = null;
+			}
 
 			function enterNodes(node) {
 				// pass in the selection for entering nodes
