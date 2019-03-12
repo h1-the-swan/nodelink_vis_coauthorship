@@ -65,7 +65,8 @@ function NodeLinkCoauthorshipVis() {
 			function enterNodes(node) {
 				// pass in the selection for entering nodes
 				
-				
+				var defaultColor = color(0);
+
 				var nodeEnter = node.enter().append("g")
 			  // .attr("r", 5)
 				.attr("class", "node")
@@ -82,20 +83,23 @@ function NodeLinkCoauthorshipVis() {
 						} else {
 						  d.radius = 5;
 						}
+
+						if (d.hasOwnProperty("cl_top")) {
+							d.color = color(d.cl_top);
+						} else {
+							d.color = defaultColor;
+						}
 					});
 
-			  var nodeCircle = nodeEnter.append("circle")
+			  var nodeCircle = nodeEnter.append("circle");
+
+			node.selectAll("circle")
 				.attr("r", function(d) {
 					return d.radius;
 				})
 				// .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
 				.attr("fill", function(d) {
-					if (d.hasOwnProperty("cl_top")) {
-						d.color_orig = color(d.cl_top);
-					} else {
-						d.color_orig = color(0);
-					}
-					return d.color_orig
+					return d.color;
 				});
 				return node;
 			}
@@ -271,6 +275,7 @@ function NodeLinkCoauthorshipVis() {
 				// nodeExit.selectAll("circle").attr("fill", "red");
 				nodeExit.remove();
 				node = enterNodes(node);
+
 
 
 				link = link

@@ -22,7 +22,8 @@ var fuseOptions = {
 
 var nodelinkvis;
 
-d3.json("data/test_coauthorship_graph.json").then(function(graph) {
+// d3.json("data/test_coauthorship_graph.json").then(function(graph) {
+d3.json("data/coauthorship_nas2_doilinked_largest_cc.json").then(function(graph) {
 	nodelinkvis = NodeLinkCoauthorshipVis().width(960).data(graph);
 	d3.select("#chartDiv").call(nodelinkvis);
 	// nodelinkvis.data(graph);
