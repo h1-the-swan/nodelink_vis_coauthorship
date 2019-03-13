@@ -116,7 +116,10 @@ def get_graph(papers, paas, authors, affiliations, author_count_cutoff=50):
                     G[a1][a2]['weight'] += 1
                 else:
                     G.add_edge(a1, a2, weight=1)
-    G = reindex_nodes(G)
+    logger.debug("{} nodes {} links before removing isolates".format(G.number_of_nodes(), G.number_of_edges()))
+    G.remove_nodes_from(list(nx.isolates(G)))
+    # G = reindex_nodes(G)
+    logger.debug("{} nodes {} links after removing isolates".format(G.number_of_nodes(), G.number_of_edges()))
     return G
 
 def reindex_nodes(G):
@@ -124,6 +127,26 @@ def reindex_nodes(G):
     for i, n in enumerate(G.nodes):
         mapping[n] = i
     return nx.relabel_nodes(G, mapping)
+
+def trim_graph(G, max_nodes=None, min_nodes_per_component=0):
+    """TODO: Limit the number of nodes in the graph by keeping only the largest connected components
+
+    :G: networkx Graph (undirected)
+    :max_nodes: The graph will have fewer than this many nodes.
+    :min_nodes_per_component: Included components will have at least this many nodes.
+    :returns: trimmed nx.Graph object
+
+    """
+    nodes_to_include = []
+    # Iterate through connected components by size
+    for c in sorted(nx.connected_components(G), key=len, reverse=True):
+        num_nodes_this_component = len(c)
+        if (num_nodes_this_component < min_nodes_per_component):
+            break
+        if (len(nodes_to_include) + num_nodes_this_component) > max_nodes:
+            break
+        nodes_to_include.extend(c)
+    return G.subgraph(nodes_to_include)
 
 # copied from infomap_large_network codebase
 # def calc_infomap(nodes, links):
@@ -146,33 +169,43 @@ def main(args):
     logger.debug("reading input file: {}".format(args.input))
     paper_ids = get_paper_ids(args.input)
     logger.debug("read {} paper ids".format(len(paper_ids)))
+
     start = timer()
     logger.debug("querying for papers...")
     df_papers = get_papers(paper_ids)
     logger.debug("done querying for papers. took {}".format(format_timespan(timer()-start)))
+
     start = timer()
     logger.debug("querying for PaperAuthorAffiliations...")
     df_paas = get_paas(paper_ids)
     logger.debug("done querying for PaperAuthorAffiliations. took {}".format(format_timespan(timer()-start)))
+
     start = timer()
     logger.debug("querying for Authors...")
     df_authors = get_authors(df_paas['Author_ID'].unique().tolist())
     logger.debug("done querying for Authors. took {}".format(format_timespan(timer()-start)))
+
     start = timer()
     logger.debug("querying for Affiliations...")
     df_affiliations = get_affiliations(df_authors['last_known_Affiliation_ID'].unique().tolist())
     logger.debug("done querying for Affiliations. took {}".format(format_timespan(timer()-start)))
+
     start = timer()
     logger.debug("constructing graph...")
     G = get_graph(df_papers, df_paas, df_authors, df_affiliations)
-    logger.debug("done constructing graph. took {}".format(format_timespan(timer()-start)))
+    logger.debug("done constructing graph ({} nodes, {} links). took {}".format(G.number_of_nodes(), G.number_of_edges(), format_timespan(timer()-start)))
+
+    start = timer()
+    logger.debug("trimming graph...")
+    G = trim_graph(G, args.max_nodes, args.min_nodes_per_component)
+    logger.debug("done trimming (new graph: {} nodes, {} links). took {}".format(G.number_of_nodes(), G.number_of_edges(), format_timespan(timer()-start)))
+
     logger.debug("writing to {}".format(args.output))
     json_data = json_graph.node_link_data(G)
     with open(args.output, 'w') as outf:
         json.dump(json_data, outf)
     
     # TODO:
-    # keep only largest connected components?
     # run infomap
 
 if __name__ == "__main__":
@@ -184,6 +217,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument("input", help="input file: newline separated MAG Paper IDs")
     parser.add_argument("output", help="output file (JSON)")
+    parser.add_argument("--max-nodes", type=int, help="Maximum number of nodes in the graph. Note that since connected components are kept intact, the number of nodes may be less than the provided number. Default: no limit")
+    parser.add_argument("--min-nodes-per-component", type=int, default=5, help="Minimum number of nodes per connected component (default: 5)")
     parser.add_argument("--debug", action='store_true', help="output debugging info")
     global args
     args = parser.parse_args()
