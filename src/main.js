@@ -35,6 +35,7 @@ d3.json("data/test_coauthorship_graph_combined_max600.json").then(function(graph
 setTimeout(function() {
 	d3.json("data/test_coauthorship_graph_misinfo_max600.json").then(function(graph) {
 		nodelinkvis.data(graph);
+		activateTooltips();
 	});
 }, 3000);
 

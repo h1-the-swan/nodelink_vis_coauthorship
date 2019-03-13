@@ -80,13 +80,11 @@ function NodeLinkCoauthorshipVis() {
 				var nodeEnter = node.enter().append("g")
 				// .attr("r", 5)
 					.attr("class", "node")
-					// .attr("transform", function(d) {
-					// 	var tx = (width/2) + d.x;
-					// 	var ty = (height/2) + d.y;
-					// 	return "translate(" + tx + "," + ty + ")";
-					// })
-					// .attr("x", function(d) { return d.x = 200; })
-					// .attr("y", function(d) { return d.y = 200; })
+					.attr("transform", function(d) {
+						var tx = (width/2) + d.x;
+						var ty = (height/2) + d.y;
+						return "translate(" + tx + "," + ty + ")";
+					})
 					.call(d3.drag()
 						.on("start", dragstarted)
 						.on("drag", dragged)
