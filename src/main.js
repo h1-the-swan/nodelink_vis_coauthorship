@@ -23,7 +23,7 @@ var fuseOptions = {
 var nodelinkvis;
 
 // d3.json("data/test_coauthorship_graph.json").then(function(graph) {
-d3.json("data/coauthorship_nas2_doilinked_largest_cc.json").then(function(graph) {
+d3.json("data/test_coauthorship_graph_combined_max600.json").then(function(graph) {
 	nodelinkvis = NodeLinkCoauthorshipVis().width(960).data(graph);
 	d3.select("#chartDiv").call(nodelinkvis);
 	// nodelinkvis.data(graph);
@@ -33,7 +33,7 @@ d3.json("data/coauthorship_nas2_doilinked_largest_cc.json").then(function(graph)
 });
 
 setTimeout(function() {
-	d3.json("data/test_coauthorship_graph_misinfo.json").then(function(graph) {
+	d3.json("data/test_coauthorship_graph_misinfo_max600.json").then(function(graph) {
 		nodelinkvis.data(graph);
 	});
 }, 3000);
