@@ -269,11 +269,13 @@ function NodeLinkCoauthorshipVis() {
 					d.id = getLinkId(d, graph.directed);
 				});
 				console.log(graph);
-				// simulation.stop();
+				simulation.stop();
 				node = node.data(graph.nodes, function(d) { return d.id; });
 				var nodeExit = node.exit();
 				// nodeExit.selectAll("circle").attr("fill", "red");
-				nodeExit.remove();
+				var t = d3.transition().duration(750);
+				// nodeExit.transition(t).remove();
+				nodeExit.selectAll("circle").transition(t).attr("r", 0);
 				node = enterNodes(node);
 
 
@@ -284,18 +286,20 @@ function NodeLinkCoauthorshipVis() {
 						return d.id;
 					});
 				var linkExit = link.exit();
-				linkExit.remove();
+				linkExit.transition(t).style("opacity", 0).remove();
 				link = enterLinks(link);
-				link.style("stroke", "red");
+				link.transition(t).style("stroke", "red");
 
 				simulation
-					.nodes(graph.nodes)
-					.on("tick", ticked);
+					.nodes(graph.nodes);
+					// .on("tick", ticked);
 
 				simulation.force("link")
 					.links(graph.links);
 
-				// simulation.restart();
+				t.end().then(function(d) {
+					simulation.restart();
+				});
 			}
 
 
