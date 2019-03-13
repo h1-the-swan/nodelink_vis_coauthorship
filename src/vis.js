@@ -46,42 +46,60 @@ function NodeLinkCoauthorshipVis() {
 			var svg = d3.select(selItem).append("svg").attr("width", width).attr("height", height);
 
 			function dragstarted(d) {
-			  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-			  d.fx = d.x;
-			  d.fy = d.y;
+				if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+				d.fx = d.x;
+				d.fy = d.y;
 			}
 
 			function dragged(d) {
-			  d.fx = d3.event.x;
-			  d.fy = d3.event.y;
+				d.fx = d3.event.x;
+				d.fy = d3.event.y;
 			}
 
 			function dragended(d) {
-			  if (!d3.event.active) simulation.alphaTarget(0);
-			  d.fx = null;
-			  d.fy = null;
+				if (!d3.event.active) simulation.alphaTarget(0);
+				d.fx = null;
+				d.fy = null;
 			}
 
-			function enterNodes(node) {
+			function enterNodes(node, t = null) {
 				// pass in the selection for entering nodes
-				
+
 				var defaultColor = color(0);
 
+				sizeScale.domain(d3.extent(graph.nodes, function(d) {
+					if (d.hasOwnProperty('flow')) {
+						return d.flow;
+					} else {
+						return [5,5]
+					}
+				}));
+				console.log(sizeScale.domain());
+
+
 				var nodeEnter = node.enter().append("g")
-			  // .attr("r", 5)
-				.attr("class", "node")
-			  .call(d3.drag()
-				  .on("start", dragstarted)
-				  .on("drag", dragged)
-				  .on("end", dragended));
+				// .attr("r", 5)
+					.attr("class", "node")
+					// .attr("transform", function(d) {
+					// 	var tx = (width/2) + d.x;
+					// 	var ty = (height/2) + d.y;
+					// 	return "translate(" + tx + "," + ty + ")";
+					// })
+					// .attr("x", function(d) { return d.x = 200; })
+					// .attr("y", function(d) { return d.y = 200; })
+					.call(d3.drag()
+						.on("start", dragstarted)
+						.on("drag", dragged)
+						.on("end", dragended));
+
 
 
 				node = node.merge(nodeEnter)
 					.each(function(d) {
 						if (d.hasOwnProperty('flow')) {
-						  d.radius = sizeScale(d.flow);
+							d.radius = sizeScale(d.flow);
 						} else {
-						  d.radius = 5;
+							d.radius = 5;
 						}
 
 						if (d.hasOwnProperty("cl_top")) {
@@ -91,26 +109,61 @@ function NodeLinkCoauthorshipVis() {
 						}
 					});
 
-			  var nodeCircle = nodeEnter.append("circle");
+				var nodeCircle = nodeEnter.append("circle")
+					// .attr("x", function(d) { return d.x; })
+					// .attr("y", function(d) { return d.y; })
+					.attr("fill", function(d) { return d.color; })
+					.attr("r", 0);
 
-			node.selectAll("circle")
-				.attr("r", function(d) {
-					return d.radius;
-				})
-				// .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
-				.attr("fill", function(d) {
-					return d.color;
-				});
+				if (t !== null) {
+					// nodeEnter.each(function(d) {
+					// 	d.x = width/2;
+					// 	d.y = height/2;
+					// });
+					node
+						.selectAll("circle").transition(t)
+						.attr("r", function(d) {
+							return d.radius;
+						})
+					// .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
+						.attr("fill", function(d) {
+							return d.color;
+						});
+				} else {
+
+					node.selectAll("circle")
+						.attr("r", function(d) {
+							return d.radius;
+						})
+					// .attr("fill", function(d) { return d.color_orig = color(d.cl_top); });
+						.attr("fill", function(d) {
+							return d.color;
+						});
+				}
+
 				return node;
 			}
 
-			function enterLinks(link) {
+			function enterLinks(link, t = null) {
 				// pass in the selection for entering links
 				
 				
-				var linkEnter = link.enter().append("line").attr("class", "link")
-				  .attr("stroke-width", function(d) { return Math.sqrt(d.weight); });
+				var linkEnter = link.enter().append("line")
+					.attr("class", "link");
 				link = link.merge(linkEnter);
+				link
+				  .attr("stroke-width", function(d) { return Math.sqrt(d.weight); });
+
+				if (t !== null) {
+					linkEnter
+						.style("opacity", 0)
+						.style("stroke", "red")
+					linkEnter.transition(t)
+						.style("opacity", 1);
+				} else {
+					//
+				}
+
 				return link;
 			}
 
@@ -130,30 +183,33 @@ function NodeLinkCoauthorshipVis() {
 				.force("charge", manyBody)
 				.force("center", d3.forceCenter(width / 2, height / 2));
 
+		  simulation
+			  .nodes(graph.nodes)
+			  .on("tick", ticked);
+
+		  simulation.force("link")
+			  .links(graph.links);
+
 			var sizeScale = d3.scaleLinear()
 				.range([4, 12]);
 
-			sizeScale.domain(d3.extent(graph.nodes, function(d) {
-				if (d.hasOwnProperty('flow')) {
-					return d.flow;
-				} else {
-					return [5,5]
-				}
-			}));
 
+			var g = svg.append("g");
 
-		  var link = svg.append("g")
+		  var link = g.append("g")
 			  .attr("class", "links")
 			// .selectAll("line")
-			.selectAll(".link")
-			.data(graph.links, function(d) {
+			.selectAll(".link");
+
+			link = link.data(graph.links, function(d) {
 				return d.id;
 			});
 
-		  var node = svg.append("g")
+		  var node = g.append("g")
 			  .attr("class", "nodes")
-			.selectAll(".node")
-			.data(graph.nodes, function(d) { return d.id; });
+			.selectAll(".node");
+
+			node = node.data(graph.nodes, function(d) { return d.id; });
 
 			node = enterNodes(node);
 			link = enterLinks(link);
@@ -183,17 +239,11 @@ function NodeLinkCoauthorshipVis() {
 			// });
 
 
-		  simulation
-			  .nodes(graph.nodes)
-			  .on("tick", ticked);
-
-		  simulation.force("link")
-			  .links(graph.links);
 
 		  function ticked() {
-			node
-			    .attr("cx", function(d) { return d.x; })
-			    .attr("cy", function(d) { return d.y; });
+			// node
+			//     .attr("cx", function(d) { return d.x; })
+			//     .attr("cy", function(d) { return d.y; });
 			// add bounding box
 			//   https://bl.ocks.org/mbostock/1129492
 			node
@@ -206,6 +256,7 @@ function NodeLinkCoauthorshipVis() {
 				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
 			link
+				// .selectAll("line")
 				.attr("x1", function(d) { return d.source.x; })
 				.attr("y1", function(d) { return d.source.y; })
 				.attr("x2", function(d) { return d.target.x; })
@@ -264,19 +315,26 @@ function NodeLinkCoauthorshipVis() {
 				graph = data;
 				graph.nodes.forEach(function(d) {
 					d.id = d.id.toString();
-				});
+				})
 				graph.links.forEach(function(d) {
 					d.id = getLinkId(d, graph.directed);
 				});
+				simulation
+					.nodes(graph.nodes)
+					.on("tick", ticked);
+
+				simulation.force("link")
+					.links(graph.links);
 				console.log(graph);
 				simulation.stop();
 				node = node.data(graph.nodes, function(d) { return d.id; });
 				var nodeExit = node.exit();
 				// nodeExit.selectAll("circle").attr("fill", "red");
-				var t = d3.transition().duration(750);
+				var t = d3.transition('updateData').duration(5000);
 				// nodeExit.transition(t).remove();
-				nodeExit.selectAll("circle").transition(t).attr("r", 0);
-				node = enterNodes(node);
+				nodeExit.selectAll("circle").transition().duration(20).attr("r", 0);
+				node = enterNodes(node, t);
+				// node = node.call(enterNodes, t);
 
 
 
@@ -286,20 +344,26 @@ function NodeLinkCoauthorshipVis() {
 						return d.id;
 					});
 				var linkExit = link.exit();
-				linkExit.transition(t).style("opacity", 0).remove();
-				link = enterLinks(link);
-				link.transition(t).style("stroke", "red");
+				// linkExit.transition(t).style("opacity", 0).remove();
+				linkExit.remove();
+				link = enterLinks(link, t);
 
-				simulation
-					.nodes(graph.nodes);
-					// .on("tick", ticked);
-
-				simulation.force("link")
-					.links(graph.links);
 
 				t.end().then(function(d) {
-					simulation.restart();
+					nodeExit.remove();
+					// simulation.alpha(1).restart();
+					simulation
+						// .alphaDecay(.0005)
+						// .velocityDecay(0.9)
+						// .alpha(.1)
+						.restart();
+					simulation.tick();
+				console.log('dddd');
 				});
+				console.log('ssss');
+				
+				// setTimeout(function() {
+				// }, 4000);
 			}
 
 
