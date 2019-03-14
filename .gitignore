@@ -7,3 +7,4 @@ public/bundle*
 public/data/
 notebooks/
 .env
+*.log

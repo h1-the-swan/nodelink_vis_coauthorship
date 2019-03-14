@@ -352,6 +352,7 @@ function NodeLinkCoauthorshipVis() {
 				linkExit.style("stroke", "red").transition(t).style("opacity", 0).remove();
 				// linkExit.remove();
 				link = enterLinks(link, t);
+				simulation.on("tick").call();
 
 
 				t.end().then(function(d) {
