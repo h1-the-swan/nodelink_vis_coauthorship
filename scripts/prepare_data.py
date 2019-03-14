@@ -129,7 +129,7 @@ def reindex_nodes(G):
     return nx.relabel_nodes(G, mapping)
 
 def trim_graph(G, max_nodes=None, min_nodes_per_component=0):
-    """TODO: Limit the number of nodes in the graph by keeping only the largest connected components
+    """Limit the number of nodes in the graph by keeping only the largest connected components
 
     :G: networkx Graph (undirected)
     :max_nodes: The graph will have fewer than this many nodes.
@@ -148,22 +148,33 @@ def trim_graph(G, max_nodes=None, min_nodes_per_component=0):
         nodes_to_include.extend(c)
     return G.subgraph(nodes_to_include)
 
-# copied from infomap_large_network codebase
-# def calc_infomap(nodes, links):
-#     this_infomap = infomap.Infomap('-t --seed 999 --silent')
-#     network = this_infomap.network()
-#     for node in nodes:
-#         _node = network.addNode(int(node))
-#         _node.disown()  # this seems to prevent an error message being sent out for every node
-#     for source, target in links:
-#         network.addLink(int(source), int(target))
-#     this_infomap.run()
-#     data = []
-#     for node in this_infomap.iterTree():
-#         if node.isLeaf():
-#             path = ":".join([str(x) for x in node.path()])
-#             data.append((node.physicalId, path))
-#     return data
+def calc_infomap(G, infomap_args='--undirected --seed 999 --silent'):
+
+    this_infomap = infomap.Infomap(infomap_args)
+    network = this_infomap.network()
+    mapping = {}
+    reverse_mapping = {}
+    for i, n in enumerate(G.nodes):
+        mapping[n] = i
+        reverse_mapping[i] = n
+
+        _node = network.addNode(mapping[n])
+        _node.disown()  # this seems to prevent an error message being sent out for every node
+
+    for source, target, weight in G.edges.data('weight'):
+        network.addLink(mapping[source], mapping[target], weight)
+    this_infomap.run()
+    for node in this_infomap.iterTree():
+        if node.isLeaf():
+            node_id = node.physicalId
+            node_name = reverse_mapping[node_id]
+            path_tuple = node.path()
+            path_str = ":".join([str(x) for x in path_tuple])
+            G.node[node_name]['flow'] = node.data.flow
+            G.node[node_name]['cl_top'] = path_tuple[0]
+            G.node[node_name]['cl_infomap'] = path_str
+            G.node[node_name]['cl_bottom'] = path_str[path_str.find(":")+1:]
+    return G
 
 def main(args):
     logger.debug("reading input file: {}".format(args.input))
@@ -200,13 +211,16 @@ def main(args):
     G = trim_graph(G, args.max_nodes, args.min_nodes_per_component)
     logger.debug("done trimming (new graph: {} nodes, {} links). took {}".format(G.number_of_nodes(), G.number_of_edges(), format_timespan(timer()-start)))
 
+    start = timer()
+    logger.debug("running infomap...")
+    G = calc_infomap(G)
+    logger.debug("done running infomap. took {}".format(format_timespan(timer()-start)))
+
     logger.debug("writing to {}".format(args.output))
     json_data = json_graph.node_link_data(G)
     with open(args.output, 'w') as outf:
         json.dump(json_data, outf)
     
-    # TODO:
-    # run infomap
 
 if __name__ == "__main__":
     total_start = timer()
