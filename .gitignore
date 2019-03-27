@@ -8,3 +8,5 @@ public/data/
 notebooks/
 .env
 *.log
+src/data
+test.html

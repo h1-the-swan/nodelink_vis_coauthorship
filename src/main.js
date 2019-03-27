@@ -1,10 +1,6 @@
-import * as d3 from 'd3';
-import jQuery from 'jquery';
-window.d3 = d3;
-window.$ = jQuery;
-window.jQuery = jQuery;
-import NodeLinkCoauthorshipVis from './vis.js';
-import activateTooltips from './coauthorship_tooltips.js';
+var NodeLinkCoauthorshipVis = nodelink_vis_coauthorship.NodeLinkCoauthorshipVis;
+
+var activateTooltips = nodelink_vis_coauthorship.activateTooltips;
 
 var fuseOptions = {
 	id: "id",
