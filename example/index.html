@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!-- <meta name="viewport" content="width=device&#45;width"> -->
+		<title>Science Communication and Misinformation Research Coauthorship Visualization</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tippy.js@4.2.1/themes/light-border.css" integrity="sha256-cpXbUNk+V/EXxqmcyU0BJe8eEFURwIYi+CTmJseXFwU=" crossorigin="anonymous">
+		<style>
+
+		.links line {
+			stroke: #999;
+			stroke-opacity: 0.6;
+		}
+
+		.nodes circle {
+			stroke: #fff;
+			stroke-width: 1.5px;
+		}
+
+		.node text {
+			pointer-events: none;
+			font: 10px sans-serif;
+		}
+
+		#nodelab-form {
+			visibility: hidden;
+		}
+
+		#tooltip-template {
+			display: none;
+		}
+
+		.paper_titles ul {
+			list-style: disc inside;
+			margin-left: 0;
+			padding-left: 0;
+		}
+
+		.paper_titles li {
+			margin: 0;
+			padding: 0;
+		}
+
+		.tippy-tooltip.label-important-theme {
+			background-color: unset;
+			color: unset;
+			border: unset;
+			padding: unset;
+			border-radius: 0;
+		}
+		
+
+		</style>
+	</head>
+
+	<body>
+		<h1>Coauthorship network example</h1>
+		<div class="vis-description">
+			<p>
+			Coauthorship network for a set of research papers in the fields of science communication and misinformation. Nodes represent authors, and weighted links represent collaborations between authors on research papers. The network was clustered using <a href="http://www.mapequation.org/" target="_blank">Infomap</a>. The colors of the nodes are assigned based on the top level of the hierarichal clustering. The size of the nodes represent the flow-based rank of each node in this network. The connected component with ten nodes or more are shown. Click and drag the nodes to move them around.
+			</p>
+		</div>
+		<div>
+			<input type="text" size="50" placeholder="Search author name or affiliation (at least 4 characters)" name="textSearch" id="textSearch"/>
+		</div>
+		<div>
+			<input type="checkbox" name="tooltipCheckbox" id="tooltipCheckbox" checked/>
+			<label for="tooltipCheckbox">Tooltips</label>
+		</div>
+		<form action="" id="nodelab-form">
+			<input type="radio" name="nodelab-radio" value="none" checked="checked">No node labels
+			<input type="radio" name="nodelab-radio" value="author_name">Show author name node labels
+			<input type="radio" name="nodelab-radio" value="affil_name">Show affiliation node labels
+		</form>
+
+		<div id="chartDiv"></div>
+		
+		<div id="tooltip-template">
+			<div class="author_name">
+				<h3 class="template-content"></h3>
+			</div>
+			<div class="cluster_id">
+				<p>Cluster ID: <span class="template-content"></span></p>
+			</div>
+			<div class="affil_name">
+				<p>Affiliation: <span class="template-content"></span></p>
+			</div>
+			<div class="paper_titles">
+				<h5>Papers:</h5>
+				<ul class="template-content">
+				</ul>
+			</div>
+		</div>  <!-- tooltip-template -->
+
+
+
+		<script>
+			var coauthorship_fname = "coauthorship_nas2_doilinked_largest_cc.json";
+		</script>
+		<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/fuse/2.6.1/fuse.min.js"></script> -->
+		<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.1/svg.min.js"></script> -->
+		<!-- <script type="text/javascript" src="svg.screenbbox.min.js"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/d3@5.9.1/dist/d3.min.js" integrity="sha256-RtVUDWfx0vF5nrvHDYcQoWSPaOuQ0R8Rq9kUG2kSvH8=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha256-ZvOgfh+ptkpoa2Y4HkRY28ir89u/+VRyDE7sB7hEEcI=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/tippy.js@4.2.1/umd/index.all.min.js" integrity="sha256-88S1J91jsNFJA0k4SqGJyfvvjjZOOCCY2Ye0UdEdxlw=" crossorigin="anonymous"></script>
+	<script src='../lib/nodelink_vis_coauthorship.js'></script>
+	<script src='./main.js'></script>
+	</body>
+</html>

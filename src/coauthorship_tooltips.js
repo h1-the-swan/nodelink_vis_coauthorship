@@ -1,6 +1,5 @@
 import tippy from 'tippy.js';
 // const tippy = require('../node_modules/tippy.js/');
-console.log(tippy);
 import 'tippy.js/themes/light-border.css';
 
 import * as d3 from 'd3';

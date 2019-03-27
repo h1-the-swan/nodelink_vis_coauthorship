@@ -9,4 +9,5 @@ notebooks/
 .env
 *.log
 src/data
+example/data
 test.html
