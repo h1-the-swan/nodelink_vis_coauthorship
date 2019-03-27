@@ -47,6 +47,7 @@
 			border: unset;
 			padding: unset;
 			border-radius: 0;
+			pointer-events: none;
 		}
 		
 
@@ -60,10 +61,10 @@
 			Coauthorship network for a set of research papers in the fields of science communication and misinformation. Nodes represent authors, and weighted links represent collaborations between authors on research papers. The network was clustered using <a href="http://www.mapequation.org/" target="_blank">Infomap</a>. The colors of the nodes are assigned based on the top level of the hierarichal clustering. The size of the nodes represent the flow-based rank of each node in this network. The connected component with ten nodes or more are shown. Click and drag the nodes to move them around.
 			</p>
 		</div>
-		<div>
+		<div style="display: none;">
 			<input type="text" size="50" placeholder="Search author name or affiliation (at least 4 characters)" name="textSearch" id="textSearch"/>
 		</div>
-		<div>
+		<div style="display: none;">
 			<input type="checkbox" name="tooltipCheckbox" id="tooltipCheckbox" checked/>
 			<label for="tooltipCheckbox">Tooltips</label>
 		</div>
