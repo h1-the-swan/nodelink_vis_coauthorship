@@ -20,11 +20,14 @@ var nodelinkvis;
 
 // d3.json("data/test_coauthorship_graph.json").then(function(graph) {
 d3.json("data/test_coauthorship_graph_seed_set_plus_autoreview_recommendations_combined_max600.json").then(function(graph) {
-	nodelinkvis = NodeLinkCoauthorshipVis().width(960)
-		.data(graph);
-	d3.select("#chartDiv").call(nodelinkvis);
-	// nodelinkvis.data(graph);
-
+	var sel = d3.select('#chartDiv');
+	console.log(sel);
+	nodelinkvis = new NodeLinkCoauthorshipVis({data: graph, el: sel});
+	// nodelinkvis = new NodeLinkCoauthorshipVis().width(960)
+	// 	.data(graph);
+	// d3.select("#chartDiv").call(nodelinkvis);
+	// // nodelinkvis.data(graph);
+    //
 	activateTooltips();
 	labelImportantNodes();
 

@@ -4,27 +4,38 @@ import * as d3 from 'd3';
 import jQuery from 'jquery';
 const $ = jQuery;
 
-export default NodeLinkCoauthorshipVis;
-
 
 
 // reusable chart pattern inspired by:
 // https://bost.ocks.org/mike/chart/
 // and
 // https://www.toptal.com/d3-js/towards-reusable-d3-js-charts
-function NodeLinkCoauthorshipVis() {
-	var data = [];
-	var width = 960;
+class NodeLinkCoauthorshipVis {
+	constructor(opts = {}) {
+		const defaults = {
+			el: null,
+			data: null,
+			width: 960,
+			color: d3.scaleOrdinal(d3.schemeCategory10),
+			forceStrength: -2,
+		};
+		Object.assign(this, defaults, opts);  // opts will overwrite defaults
+		this._data = this.data;
+		this.data = this.updateData;
+		if (typeof this.height === 'undefined') {
+			this.height = .625 * this.width;
+		}
+		this.manyBody = d3.forceManyBody()
+							.strength(this.forceStrength);
+		this.init = false;
+		console.log(this._data);
+		if (this.el !== null && this._data !== null) {
+			this.draw(this.el);
+			this.init = true;
+		}
+	}
 
-	var updateData;
-	var updateWidth;
-
-	var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-	var manyBody = d3.forceManyBody()
-						.strength(-2);
-
-	function getLinkId(link, directed = false) {
+	getLinkId(link, directed = false) {
 		// link ID will be the concatenation of the source ID and target ID, separated by "-&-"
 		// If the graph is undirected, the IDs will be sorted ALPHABETICALLY using the string values of the ID
 		var source = link.source.toString();
@@ -37,13 +48,35 @@ function NodeLinkCoauthorshipVis() {
 		return items[0] + sep + items[1];
 	}
 
+	updateData(value) {
+		if (!arguments.length) return this._data;
+		this._data = value;
+		if (this.init === false) {
+			this.draw(this.el);
+			this.init = true;
+		} else {
+			// this.updateData();
+			// NOT IMPLEMENTED
+			console.log("UPDATING DATA NOT YET IMPLEMENTED");
+		}
+		// console.log(typeof updateData);
+		// if (typeof updateData === 'function') updateData();
+		return this;
+	};
 
-	function chart(selection) {
+	draw(selection) {
+		var obj = this;
+		var width = this.width;
+		var height = this.height;
+		var graph = this._data;
+		var manyBody = this.manyBody;
+		var color = this.color;
+		var getLinkId = this.getLinkId;
 		selection.each(function() {
 			var selItem = this;
 
-			var height = .625 * width;
 			var svg = d3.select(selItem).append("svg").attr("width", width).attr("height", height);
+			console.log(graph);
 
 			function dragstarted(d) {
 				if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -173,8 +206,6 @@ function NodeLinkCoauthorshipVis() {
 				return link;
 			}
 
-			var graph = data;
-			console.log(graph);
 
 			graph.nodes.forEach(function(d) {
 				d.id = d.id.toString();
@@ -195,6 +226,8 @@ function NodeLinkCoauthorshipVis() {
 
 		  simulation.force("link")
 			  .links(graph.links);
+
+		  this.simulation = simulation;
 
 			var sizeScale = d3.scaleLinear()
 				.range([4, 12]);
@@ -309,92 +342,72 @@ function NodeLinkCoauthorshipVis() {
 			// 	}
 			// }
 
-			updateWidth = function() {
-				// use width to make any changes
-				//
-				// NOT IMPLEMENTED
-			};
+			// updateWidth = function() {
+			// 	// use width to make any changes
+			// 	//
+			// 	// NOT IMPLEMENTED
+			// };
 
-			updateData = function() {
-				// use D3 update pattern with data
-
-				graph = data;
-				graph.nodes.forEach(function(d) {
-					d.id = d.id.toString();
-				})
-				graph.links.forEach(function(d) {
-					d.id = getLinkId(d, graph.directed);
-				});
-				simulation
-					.nodes(graph.nodes)
-					.on("tick", ticked);
-
-				simulation.force("link")
-					.links(graph.links);
-				console.log(graph);
-				simulation.stop();
-				node = node.data(graph.nodes, function(d) { return d.id; });
-				var nodeExit = node.exit();
-				// nodeExit.selectAll("circle").attr("fill", "red");
-				var t = d3.transition('updateData').duration(5000);
-				nodeExit.selectAll("circle").style("stroke", "red").transition(t).attr("r", 0);
-				node = enterNodes(node, t);
-				// node = node.call(enterNodes, t);
-
-
-
-				link = link
-					.data(graph.links, function(d) {
-						// d.id = getLinkId(d);
-						return d.id;
-					});
-				var linkExit = link.exit();
-				linkExit.style("stroke", "red").transition(t).style("opacity", 0).remove();
-				// linkExit.remove();
-				link = enterLinks(link, t);
-				simulation.on("tick").call();
-
-
-				t.end().then(function(d) {
-					nodeExit.remove();
-					// simulation.alpha(1).restart();
-					// simulation
-						// .alphaDecay(.0005)
-						// .velocityDecay(0.9)
-						// .alpha(.1)
-						// .restart();
-				console.log('dddd');
-				});
-				console.log('ssss');
-				
-				// setTimeout(function() {
-				// }, 4000);
-			}
 
 
 
 		});
-
+	return this;
 	}
-	chart.data = function(value) {
-		if (!arguments.length) return data;
-		data = value;
-		console.log(typeof updateData);
-		if (typeof updateData === 'function') updateData();
-		return chart;
-	};
 
-	chart.width = function(value) {
-		if (!arguments.length) return width;
-		width = value;
-		if (typeof updateWidth === 'function') updateWidth();
-		return chart;
-	};
-
-	return chart;
-	
+	// updateData() {
+	// 	// use D3 update pattern with data
+    //
+	// 	var graph = this._data;
+	// 	graph.nodes.forEach(function(d) {
+	// 		d.id = d.id.toString();
+	// 	})
+	// 	graph.links.forEach(function(d) {
+	// 		d.id = getLinkId(d, graph.directed);
+	// 	});
+	// 	this.simulation
+	// 		.nodes(graph.nodes)
+	// 		.on("tick", ticked);
+    //
+	// 	simulation.force("link")
+	// 		.links(graph.links);
+	// 	console.log(graph);
+	// 	simulation.stop();
+	// 	node = node.data(graph.nodes, function(d) { return d.id; });
+	// 	var nodeExit = node.exit();
+	// 	// nodeExit.selectAll("circle").attr("fill", "red");
+	// 	var t = d3.transition('updateData').duration(5000);
+	// 	nodeExit.selectAll("circle").style("stroke", "red").transition(t).attr("r", 0);
+	// 	node = enterNodes(node, t);
+	// 	// node = node.call(enterNodes, t);
+    //
+    //
+    //
+	// 	link = link
+	// 		.data(graph.links, function(d) {
+	// 			// d.id = getLinkId(d);
+	// 			return d.id;
+	// 		});
+	// 	var linkExit = link.exit();
+	// 	linkExit.style("stroke", "red").transition(t).style("opacity", 0).remove();
+	// 	// linkExit.remove();
+	// 	link = enterLinks(link, t);
+	// 	simulation.on("tick").call();
+    //
+    //
+	// 	t.end().then(function(d) {
+	// 		nodeExit.remove();
+	// 		// simulation.alpha(1).restart();
+	// 		// simulation
+	// 			// .alphaDecay(.0005)
+	// 			// .velocityDecay(0.9)
+	// 			// .alpha(.1)
+	// 			// .restart();
+	// 	});
+	// 	
+	// 	// setTimeout(function() {
+	// 	// }, 4000);
+	// }
 }
 
-
-
-
+export default NodeLinkCoauthorshipVis;
