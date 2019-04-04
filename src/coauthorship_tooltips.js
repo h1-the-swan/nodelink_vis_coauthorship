@@ -30,11 +30,18 @@ function activateTooltips() {
 			var tippyInstance = tippy(this);
 		}
 		fillHtml($tooltipNode, 'author_name', d.author_name);
-		fillHtml($tooltipNode, 'affil_name', d.affil_name);
-		if (d.hasOwnProperty('cl_bottom')) fillHtml($tooltipNode, 'cluster_id', d.cl_bottom);
+		if (d.hasOwnProperty('affil_name') && d.affil_name.length) {
+			fillHtml($tooltipNode, 'affil_name', d.affil_name);
+		} else {
+			$tooltipNode.find('.affil_name').hide();
+		}
+		// if (d.hasOwnProperty('cl_bottom')) fillHtml($tooltipNode, 'cluster_id', d.cl_bottom);
 		var $paperTitles = $tooltipNode.find( '.paper_titles' ).find( '.template-content' );
-		for (var i = 0, len = d.papers.length; i < len; i++) {
-			var $listItem = $( '<li class="paper_title">' ).text(d.papers[i].title);
+		var papers = d.papers;
+		// sort papers alphabetically
+		papers.sort(function(a, b) { return d3.ascending(a.title, b.title); });
+		for (var i = 0, len = papers.length; i < len; i++) {
+			var $listItem = $( '<li class="paper_title">' ).text(papers[i].title);
 			$paperTitles.append( $listItem );
 		}
 		tippyInstance.setContent($tooltipNode.html());
