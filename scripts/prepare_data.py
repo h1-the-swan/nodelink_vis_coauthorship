@@ -144,7 +144,11 @@ def trim_graph(G, max_nodes=None, min_nodes_per_component=0):
         if (num_nodes_this_component < min_nodes_per_component):
             break
         if (len(nodes_to_include) + num_nodes_this_component) > max_nodes:
-            break
+            if len(nodes_to_include) > 0:
+                break
+            else:
+                logger.warning("The first connected component has {} nodes, which is more than max_nodes ({}). Including the first connected component.".format(num_nodes_this_component, max_nodes))
+                pass
         nodes_to_include.extend(c)
     return G.subgraph(nodes_to_include)
 
