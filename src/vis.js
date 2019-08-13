@@ -135,7 +135,9 @@ class NodeLinkCoauthorshipVis {
 							d.radius = 5;
 						}
 
-						if (d.hasOwnProperty("cl_top")) {
+						if (d.hasOwnProperty("color_group")) {
+							d.color = color(d.color_group);
+						} else if (d.hasOwnProperty("cl_top")) {
 							d.color = color(d.cl_top);
 						} else {
 							d.color = defaultColor;
