@@ -2,10 +2,13 @@ decorator==4.3.2
 humanfriendly==4.18
 infomap==1.0.0b47
 -e git://github.com/h1-the-swan/mysql_connect.git@cb225c6d4f1c14bcd9275f1e934d6a007d576f97#egg=mysql_connect
-networkx==2.2
+networkx==2.4
 numpy==1.16.2
-pandas==0.24.1
+pandas==1.0.1
+py4j==0.10.7
+pyarrow==0.16.0
 PyMySQL==0.9.3
+pyspark==2.4.5
 python-dateutil==2.8.0
 python-dotenv==0.10.1
 pytz==2018.9
