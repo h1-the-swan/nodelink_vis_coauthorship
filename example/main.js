@@ -22,7 +22,7 @@ var nodelinkvis;
 var params = new URLSearchParams(window.location.search);
 var filename = params.get('fn');
 if (filename === null) {
-	filename = "data/test_coauthorship_graph_seed_set_plus_autoreview_recommendations_combined_max600.json";
+	filename = "data/test_coauthorship_graph_combined_max600.json";
 }
 d3.json(filename).then(function(graph) {
 	var sel = d3.select('#chartDiv');
