@@ -19,7 +19,12 @@ var fuseOptions = {
 var nodelinkvis;
 
 // d3.json("data/test_coauthorship_graph.json").then(function(graph) {
-d3.json("data/test_coauthorship_graph_seed_set_plus_autoreview_recommendations_combined_max600.json").then(function(graph) {
+var params = new URLSearchParams(window.location.search);
+var filename = params.get('fn');
+if (filename === null) {
+	filename = "data/test_coauthorship_graph_seed_set_plus_autoreview_recommendations_combined_max600.json";
+}
+d3.json(filename).then(function(graph) {
 	var sel = d3.select('#chartDiv');
 	console.log(sel);
 	nodelinkvis = new NodeLinkCoauthorshipVis({data: graph, el: sel});
