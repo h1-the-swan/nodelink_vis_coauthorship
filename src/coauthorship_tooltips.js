@@ -30,7 +30,8 @@ function activateTooltips() {
 			var tippyInstance = tippy(this);
 		}
 		fillHtml($tooltipNode, 'author_name', d.author_name);
-		if (d.hasOwnProperty('affil_name') && d.affil_name.length) {
+		// if (d.hasOwnProperty('affil_name') && d.affil_name.length) {
+		if (d.hasOwnProperty('affil_name')) {
 			fillHtml($tooltipNode, 'affil_name', d.affil_name);
 		} else {
 			$tooltipNode.find('.affil_name').hide();

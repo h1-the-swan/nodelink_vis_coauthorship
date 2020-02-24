@@ -22,7 +22,7 @@ var nodelinkvis;
 var params = new URLSearchParams(window.location.search);
 var filename = params.get('fn');
 if (filename === null) {
-	filename = "data/test_coauthorship_graph_combined_max600.json";
+	filename = "data/test_coauthorship_graph.json";
 }
 d3.json(filename).then(function(graph) {
 	var sel = d3.select('#chartDiv');
@@ -35,6 +35,7 @@ d3.json(filename).then(function(graph) {
     //
 	activateTooltips();
 	labelImportantNodes();
+	textSearch(graph.nodes);
 
 });
 
@@ -70,6 +71,7 @@ function labelImportantNodes() {
 		// });
 	x.append("circle").attr("r", 0.0001).style("visible", "hidden")
 		.each(function(d) {
+			// d.radius = 0.0001;
 			var instance = tippy(this, {
 				// animation: "scale",
 				placement: "right",
@@ -89,6 +91,37 @@ function labelImportantNodes() {
 			// instance.show();
 		});
 	// x.append('text').text(function(d) { return d.author_name; });
+}
+
+function textSearch(nodes) {
+	var fuse = new Fuse(nodes, fuseOptions);
+	$( '#textSearch' )
+		.show()
+		.find( 'input' )
+		.on( 'input', fuseSelect );
+	function fuseSelect() {
+		// reset node sizes and styles
+		d3.selectAll(".node > circle")
+			.style("stroke-width", 1)
+			.style("stroke", "white")
+			.attr("r", function(d) { return d.radius; });
+
+		var $this = $( this );
+		var query = $this.val();
+		console.log($this.val());
+		if (query.length > 3) {
+			var result = fuse.search(query);
+			if (result.length !=0) {
+				for (var i = 0, len = result.length; i < len; i++) {
+					var authorId = result[i];
+					d3.selectAll(".node > circle").filter(function(d) { return d.id == authorId; })
+						.style("stroke-width", 2)
+						.style("stroke", "black")
+						.attr("r", function(d) { return d.radius * 1.5; });
+				}
+			}
+		}
+	}
 }
 
 $( document ).ready(function() {
