@@ -18,6 +18,14 @@ OPTIONAL_VARS = [
     'MYSQL_PROTOCOL', # will default to "mysql+pymysql"
 ]
 
+# Microsoft Academic Graph (MAG) data
+datadir_mag = Path(os.environ['DATADIR_MAG'])
+fpath_mag_papers = list(datadir_mag.joinpath('parquet').glob('*Papers*parquet'))[0]
+fpath_mag_citations = list(datadir_mag.joinpath('parquet').glob('*PaperReferences*parquet'))[0]
+fpath_mag_paperauthors = list(datadir_mag.joinpath('parquet').glob('*PaperAuthorAffiliations*parquet'))[0]
+fpath_mag_authors = list(datadir_mag.joinpath('parquet').glob('*_Authors*parquet'))[0]
+fpath_mag_affils = list(datadir_mag.joinpath('parquet').glob('*_Affiliations*parquet'))[0]
+
 class Config(object):
 
     def __init__(self, spark_mem=None, path_to_paper_data=None, path_to_citation_data=None):
@@ -38,14 +46,14 @@ class Config(object):
 
         self._elasticsearch = None
 
-        self.mag_datadir = Path(os.environ['MAG_DATADIR'])
+        self.mag_datadir = datadir_mag
         if 'parquet' not in str(self.mag_datadir):
-            self.mag_datadir = self.mag_datadir.joinpath('parquet')
+            self.mag_datadir = datadir_mag
         self.mag_fpaths = {
-            'Papers': self.mag_datadir.joinpath('mag_201911_Papers_20200205_parquet'),
-            'PaperAuthorAffiliations': self.mag_datadir.joinpath('mag_201911_PaperAuthorAffiliations_20200205_parquet'),
-            'Authors': self.mag_datadir.joinpath('mag_201911_Authors_20200221_parquet'),
-            'Affiliations': self.mag_datadir.joinpath('mag_201911_Affiliations_20200205_parquet')
+            'Papers': fpath_mag_papers,
+            'PaperAuthorAffiliations': fpath_mag_paperauthors,
+            'Authors': fpath_mag_authors,
+            'Affiliations': fpath_mag_affils
         }
 
     def get(self, x, default=None):
